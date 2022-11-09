@@ -1,5 +1,5 @@
 import { useGetApi, USER_CLASSES } from "../../hooks/Api";
-
+import { Routes, Route, useLocation } from "react-router-dom";
 import { getDay, getDate, getMonth } from "../../utils/Time";
 
 //https://www.ditdot.hr/en/dark-mode-website-tutorial colour overrides
@@ -68,13 +68,27 @@ function Homeworks() {
 
   return (
     <>
-      <div className="w-96 bg-gray-200 h-screen flex flex-col items-center p-2.5 gap-2.5">
-        {homeworks.map((data) => (
-          <HomeworkButton data={data} />
-        ))}
+      <div className="flex flex-row">
+        <div className="w-96 bg-gray-200 h-screen flex flex-col items-center p-2.5 gap-2.5">
+          {homeworks.map((data) => (
+            <HomeworkButton data={data} />
+          ))}
+        </div>
+        <div>
+          <Routes>
+            <Route path="/">
+              <Route path="/:homeworkId" element={<HomeworkPage />} />
+            </Route>
+          </Routes>
+        </div>
       </div>
     </>
   );
+}
+
+function HomeworkPage() {
+  const location = useLocation();
+  return <div>{JSON.stringify(location)}</div>;
 }
 
 export default Homeworks;
