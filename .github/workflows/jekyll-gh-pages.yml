@@ -12,7 +12,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.build-publish.outputs.page_url }} + "SatchelTwo-Revised/"
+      url: ${{ steps.build-publish.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
     - id: build-publish
