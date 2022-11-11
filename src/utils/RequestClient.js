@@ -1,14 +1,15 @@
 import axios from "axios";
+import { getIdToken } from "firebase/auth";
 
 const axiosClient = axios.create({
   baseURL: "https://satcheltwo-api.abstractpoo.repl.co",
   json: true,
 });
 
-function callWrap(method, auth, args) {
+async function callWrap(method, auth, args) {
   return axiosClient({
     method: method,
-    headers: { authtoken: auth.currentUser.accessToken || "" },
+    headers: { authtoken: (await getIdToken(auth.currentUser)) || "" },
     ...args,
   });
 }

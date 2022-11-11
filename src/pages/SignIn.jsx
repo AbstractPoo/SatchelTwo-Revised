@@ -1,15 +1,16 @@
 import { useAuth } from "../hooks/Auth";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, GoogleIcon, SatchelTwoIcon } from "../components/Library";
 
 function SignIn() {
   const { user, googleSignIn } = useAuth();
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get("redirect");
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate(redirectTo || "/");
     }
   }, [user]);
 

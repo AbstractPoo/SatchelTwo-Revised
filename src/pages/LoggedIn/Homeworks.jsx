@@ -1,38 +1,31 @@
 import { useGetApi, USER_CLASSES } from "../../hooks/Api";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { getDay, getDate, getMonth } from "../../utils/Time";
 
-const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+//https://www.ditdot.hr/en/dark-mode-website-tutorial colour overrides
+
 const homeworkImportanceColors = ["#D95F5F", "#ECA25E", "#75D066"];
 const homeworkImportanceDefinitions = ["PAST DUE", "DUE TODAY", "UPCOMING"];
 
-function Homework({ data }) {
+function getImportance(due) {
+  const currentDate = new Date();
+  return due.toDateString() === currentDate.toDateString()
+    ? 1
+    : due < currentDate
+    ? 0
+    : 2;
+}
+
+function HomeworkButton({ data }) {
   const set = new Date(data.set);
   const due = new Date(data.due);
 
-  const dueDay = weekdays[due.getDay()];
-  const dueDate = due.getDate();
-  const dueMonth = months[due.getMonth()];
-  const currentDate = new Date();
-
-  const importance =
-    due.toDateString() === currentDate.toDateString()
-      ? 1
-      : due < currentDate
-      ? 0
-      : 2;
+  const dueDay = getDay(due);
+  const dueDate = getDate(due);
+  const dueMonth = getMonth(due);
+  const importance = getImportance(due);
+  const importanceColor = homeworkImportanceColors[importance];
+  const importanceDefinition = homeworkImportanceDefinitions[importance];
   return (
     <div
       key={data._id}
@@ -40,18 +33,15 @@ function Homework({ data }) {
     >
       <div
         className="w-24 h-full flex flex-col justify-around p-3 items-center rounded-tl rounded-bl"
-        style={{ backgroundColor: homeworkImportanceColors[importance] }}
+        style={{ backgroundColor: importanceColor }}
       >
         <div className="text-sm text-white/75">{dueDay}</div>
         <div className="text-2xl text-white">{dueDate}</div>
         <div className="text-sm text-white/75">{dueMonth}</div>
       </div>
       <div className="p-3 flex flex-col justify-around">
-        <div
-          className="font-bold text-xs"
-          style={{ color: homeworkImportanceColors[importance] }}
-        >
-          {homeworkImportanceDefinitions[importance]}
+        <div className="font-bold text-xs" style={{ color: importanceColor }}>
+          {importanceDefinition}
         </div>
         <div className="font-semibold w-[180px] text-lg truncate">
           {data.title}
@@ -62,37 +52,6 @@ function Homework({ data }) {
     </div>
   );
 }
-
-const exampleData = [
-  {
-    title: "Analysis",
-    description: "Send your analysis by the end of the day",
-    set: "2022-10-18T13:40:52.915Z",
-    due: "2022-10-19T01:40:52.915Z",
-    class: "13Co/a1",
-  },
-  {
-    title: "Design",
-    description: "Send your design by the end of the day",
-    set: "2022-10-18T13:40:54.267Z",
-    due: new Date().toString(),
-    class: "13Co/a1",
-  },
-  {
-    title: "Pure chapters",
-    description: "Complete chapters 1a, b and c from your pure book",
-    set: "2022-10-18T13:40:54.267Z",
-    due: new Date("2022-10-22").toString(),
-    class: "13Ma/a1",
-  },
-  {
-    title: "Moments",
-    description: "Finish the exercise started in class on moments",
-    set: "2022-10-18T13:40:54.267Z",
-    due: new Date("2022-11-03").toString(),
-    class: "13Ma/a1",
-  },
-];
 
 function Homeworks() {
   const rawHomeworks = useGetApi(USER_CLASSES);
@@ -109,13 +68,27 @@ function Homeworks() {
 
   return (
     <>
-      <div className="w-96 bg-gray-200 h-screen flex flex-col items-center p-2.5 gap-2.5">
-        {homeworks.map((data) => (
-          <Homework data={data} />
-        ))}
+      <div className="flex flex-row">
+        <div className="w-96 bg-gray-200 h-screen flex flex-col items-center p-2.5 gap-2.5">
+          {homeworks.map((data) => (
+            <HomeworkButton data={data} />
+          ))}
+        </div>
+        <div>
+          <Routes>
+            <Route path="/">
+              <Route path="/:homeworkId" element={<HomeworkPage />} />
+            </Route>
+          </Routes>
+        </div>
       </div>
     </>
   );
+}
+
+function HomeworkPage() {
+  const location = useLocation();
+  return <div>{JSON.stringify(location)}</div>;
 }
 
 export default Homeworks;

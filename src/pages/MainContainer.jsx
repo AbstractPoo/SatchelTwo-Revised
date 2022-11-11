@@ -8,7 +8,7 @@ function MainContainer() {
   const { logOut } = useAuth();
 
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex h-screen">
       <NavigationBar />
       <div>
         {
@@ -17,10 +17,10 @@ function MainContainer() {
         <Routes>
           <Route path="/">
             <Route index element={<Navigate to="/homeworks" />} />
-            <Route path="/homeworks" element={<Homeworks />} />
+            <Route path="/homeworks/*" element={<Homeworks />} />
             <Route
-              path="/subscriptions"
-              element={<>some suibscriptions kid</>}
+              path="/subscriptions/*"
+              element={<>future subscriptions page</>}
             />
           </Route>
         </Routes>
