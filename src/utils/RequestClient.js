@@ -6,7 +6,7 @@ const axiosClient = axios.create({
   json: true,
 });
 
-async function callWrap(method, auth, args) {
+async function request(method, auth, args) {
   return axiosClient({
     method: method,
     headers: { authtoken: (await getIdToken(auth.currentUser)) || "" },
@@ -15,16 +15,12 @@ async function callWrap(method, auth, args) {
 }
 
 class Client {
-  constructor(auth) {
-    this.auth = auth;
-  }
-
   get(auth, args) {
-    return callWrap("get", auth, args);
+    return request("get", auth, args);
   }
 
   post(auth, args) {
-    return callWrap("post", auth, args);
+    return request("post", auth, args);
   }
 }
 
