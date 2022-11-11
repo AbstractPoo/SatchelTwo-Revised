@@ -1,5 +1,5 @@
 import {
-  BrowserRouter,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -21,9 +21,8 @@ function Router() {
   const auth = useAuth();
   return (
     <>
-      <BrowserRouter>
+      <Router>
         <Routes>
-    <Route path="/SatchelTwo-Revised/">
           <Route path="/signin" element={<SignIn />} />
 
           {auth?.user ? (
@@ -31,9 +30,8 @@ function Router() {
           ) : (
             <Route path="*" element={<NavigateWithRedirect to="/signin" />} />
           )}
-          </Route>
         </Routes>
-      </BrowserRouter>
+      </Router>
     </>
   );
 }
