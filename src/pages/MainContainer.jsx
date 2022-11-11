@@ -20,7 +20,7 @@ function MainContainer() {
             <Route path="/homeworks/*" element={<Homeworks />} />
             <Route
               path="/subscriptions/*"
-              element={<>some suibscriptions kid</>}
+              element={<>future subscriptions page</>}
             />
           </Route>
         </Routes>
