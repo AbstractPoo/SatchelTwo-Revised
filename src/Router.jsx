@@ -23,6 +23,7 @@ function Router() {
     <>
       <BrowserRouter>
         <Routes>
+    <Route path="/SatchelTwo-Revised/">
           <Route path="/signin" element={<SignIn />} />
 
           {auth?.user ? (
@@ -30,6 +31,7 @@ function Router() {
           ) : (
             <Route path="*" element={<NavigateWithRedirect to="/signin" />} />
           )}
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
