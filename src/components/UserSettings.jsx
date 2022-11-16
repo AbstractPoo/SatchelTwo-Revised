@@ -21,7 +21,7 @@ function TabButton({ name }) {
   );
 }
 
-function UserSettings() {
+function UserSettings({ hideSettings }) {
   const [page, setPage] = useState("appearance");
   return (
     <>
@@ -29,6 +29,7 @@ function UserSettings() {
       <div className="absolute inset-0 z-50 w-screen h-screen flex justify-center items-center">
         <div>
           <div className="w-60 bg-neutral-900 rounded opacity-100 flex p-2.5">
+            <button onClick={hideSettings}>X</button>
             <div clasName="w-20 h-full">
               {pagesTabs.map((pageTab) => (
                 <TabButton {...pageTab} />

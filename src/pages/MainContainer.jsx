@@ -3,6 +3,8 @@ import NavigationBar from "../components/NavigationBar";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Button } from "../components/Library";
 import Homeworks from "./LoggedIn/Homeworks";
+import Teacher from "./Teacher/Teacher";
+import AuthLocked from "../components/AuthLocked";
 
 function MainContainer() {
   const { logOut } = useAuth();
@@ -21,6 +23,15 @@ function MainContainer() {
             <Route
               path="/subscriptions/*"
               element={<>future subscriptions page</>}
+            />
+
+            <Route
+              path="/teacher/*"
+              element={
+                <AuthLocked level={1}>
+                  <Teacher />
+                </AuthLocked>
+              }
             />
           </Route>
         </Routes>

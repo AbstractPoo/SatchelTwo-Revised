@@ -1,4 +1,10 @@
-import { useGetApi, USER_CLASSES } from "../../hooks/Api";
+import {
+  useGetApi,
+  usePostApi,
+  USER_CLASSES,
+  HOMEWORK_CREATE,
+  USER_HOMEWORKS,
+} from "../../hooks/Api";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { getDay, getDate, getMonth } from "../../utils/Time";
 
@@ -56,25 +62,17 @@ function HomeworkButton({ data }) {
 }
 
 function Homeworks() {
-  const rawHomeworks = useGetApi(USER_CLASSES);
-
-  let homeworks = [];
-
-  if (rawHomeworks) {
-    rawHomeworks.forEach((cl) => {
-      cl.homeworks.forEach((homework) => {
-        homeworks.push(homework);
-      });
-    });
-  }
+  const homeworks = useGetApi(USER_HOMEWORKS);
 
   return (
     <>
       <div className="flex flex-row">
         <div className="w-96 bg-gray-200 dark:bg-neutral-800 h-screen flex flex-col items-center p-2.5 gap-2.5">
-          {homeworks.map((data) => (
-            <HomeworkButton data={data} />
-          ))}
+          {homeworks ? (
+            homeworks.map((data) => <HomeworkButton data={data} />)
+          ) : (
+            <>loading homeworks</>
+          )}
         </div>
         <div>
           <Routes>

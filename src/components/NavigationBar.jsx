@@ -1,7 +1,8 @@
 import { SatchelTwoIcon } from "./Library";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/Auth";
+import { USER_DATA, useGetApi } from "../hooks/Api";
 import {
   HomeworksNavigationIcon,
   SubscriptionsNavigationIcon,
@@ -19,6 +20,12 @@ const navigationRoutes = [
     name: "Subscriptions",
     icon: <SubscriptionsNavigationIcon />,
   },
+  {
+    href: "/teacher",
+    name: "Teacher",
+    icon: <SubscriptionsNavigationIcon />,
+    routeLevel: 1,
+  },
 ];
 
 // 3B3A47 use this colour becuase brian thinks it looks nice :)
@@ -26,9 +33,14 @@ const navigationRoutes = [
 function NavigationBar() {
   const [settings, setSettings] = useState(false);
   const { user } = useAuth();
+  const userData = useGetApi(USER_DATA);
 
   function displaySettings() {
     setSettings(true);
+  }
+
+  function hideSettings() {
+    setSettings(false);
   }
 
   return (
@@ -41,12 +53,19 @@ function NavigationBar() {
           </div>
         </div>
         <div className="flex flex-col gap-2.5 w-full">
-          {navigationRoutes.map((route) => (
-            <NavigationButton {...route} />
-          ))}
+          {navigationRoutes.flatMap((route) => {
+            if (
+              !route.routeLevel ||
+              (userData?.level && userData?.level >= route.routeLevel)
+            ) {
+              return [<NavigationButton {...route} />];
+            } else {
+              return [];
+            }
+          })}
         </div>
       </div>
-      {settings ? <UserSettings /> : <></>}
+      {settings ? <UserSettings hideSettings={hideSettings} /> : <></>}
       <div>
         <button
           onClick={displaySettings}
