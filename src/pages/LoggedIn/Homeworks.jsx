@@ -67,14 +67,17 @@ function Homeworks() {
 
   return (
     <>
-      <div className="flex flex-row">
-        <div className="w-96 bg-gray-200 dark:bg-neutral-800 h-screen flex flex-col items-center p-2.5 gap-2.5">
-          {homeworks ? (
-            homeworks.map((data) => <HomeworkButton data={data} />)
-          ) : (
-            <LoadingSpinner />
-          )}
-        </div>
+      <div className="flex flex-row justify-center items-center h-screen w-96 bg-gray-200 dark:bg-neutral-800">
+        {homeworks ? (
+          <div className="w-full h-full flex flex-col items-center p-2.5 gap-2.5">
+            {homeworks.map((data) => (
+              <HomeworkButton data={data} />
+            ))}
+          </div>
+        ) : (
+          <LoadingSpinner size="8" />
+        )}
+
         <div>
           <Routes>
             <Route path="/">

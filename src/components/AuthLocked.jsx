@@ -1,4 +1,3 @@
-import { Route } from "react-router-dom";
 import { useGetApi, USER_DATA } from "../hooks/Api";
 import LoadingScreen from "./Loading";
 
