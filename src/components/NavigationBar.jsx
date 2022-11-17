@@ -58,7 +58,7 @@ function NavigationBar() {
               !route.routeLevel ||
               (userData?.level && userData?.level >= route.routeLevel)
             ) {
-              return [<NavigationButton {...route} />];
+              return [<NavigationButton key={route.name} {...route} />];
             } else {
               return [];
             }

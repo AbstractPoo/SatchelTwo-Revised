@@ -5,7 +5,7 @@ import {
   HOMEWORK_CREATE,
   USER_HOMEWORKS,
 } from "../../hooks/Api";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useParams } from "react-router-dom";
 import { getDay, getDate, getMonth } from "../../utils/Time";
 import { LoadingSpinner } from "../../components/Loading";
 
@@ -50,7 +50,7 @@ function HomeworkButton({ data }) {
         <div className="font-bold text-xs" style={{ color: importanceColor }}>
           {importanceDefinition}
         </div>
-        <div className="font-semibold w-[180px] text-lg truncate dark:text-white">
+        <div className="font-semibold w-[180px] text-md truncate dark:text-white">
           {data.title}
         </div>
         <div className="text-xs w-[180px] truncate dark:text-white/75">
@@ -67,22 +67,27 @@ function Homeworks() {
 
   return (
     <>
-      <div className="flex flex-row justify-center items-center h-screen w-96 bg-gray-200 dark:bg-neutral-800">
-        {homeworks ? (
-          <div className="w-full h-full flex flex-col items-center p-2.5 gap-2.5">
-            {homeworks.map((data) => (
-              <HomeworkButton data={data} />
-            ))}
-          </div>
-        ) : (
-          <LoadingSpinner size="8" />
-        )}
+      <div className="flex flex-row h-screen">
+        <div
+          className={
+            "w-96 bg-gray-200 dark:bg-neutral-800" +
+            (!homeworks ? " flex justify-center items-center" : "")
+          }
+        >
+          {homeworks ? (
+            <div className=" h-full flex flex-col items-center p-2.5 gap-2.5 ">
+              {homeworks.map((data) => (
+                <HomeworkButton key={data._id} data={data} />
+              ))}
+            </div>
+          ) : (
+            <LoadingSpinner size="8" />
+          )}
+        </div>
 
         <div>
           <Routes>
-            <Route path="/">
-              <Route path="/:homeworkId" element={<HomeworkPage />} />
-            </Route>
+            <Route path="/:homeworkId" element={<HomeworkPage />} />
           </Routes>
         </div>
       </div>
@@ -91,8 +96,13 @@ function Homeworks() {
 }
 
 function HomeworkPage() {
+  const params = useParams();
   const location = useLocation();
-  return <div>{JSON.stringify(location)}</div>;
+  return (
+    <div className="w-full">
+      this is actually quite nice{JSON.stringify(params)}
+    </div>
+  );
 }
 
 export default Homeworks;

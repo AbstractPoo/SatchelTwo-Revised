@@ -10,9 +10,9 @@ function MainContainer() {
   const { logOut } = useAuth();
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen w-screen">
       <NavigationBar />
-      <div>
+      <div className="w-full">
         {
           //<Button onClick={logOut}>log out of the account skid</Button>
         }
