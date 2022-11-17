@@ -1,5 +1,6 @@
 import { Route } from "react-router-dom";
 import { useGetApi, USER_DATA } from "../hooks/Api";
+import LoadingScreen from "./Loading";
 
 function AuthLocked({ children, level }) {
   const userData = useGetApi(USER_DATA);
@@ -10,7 +11,7 @@ function AuthLocked({ children, level }) {
       <>you are not authorised to be here</>
     )
   ) : (
-    <>loading</>
+    <LoadingScreen />
   );
 }
 

@@ -7,6 +7,7 @@ import {
 } from "../../hooks/Api";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { getDay, getDate, getMonth } from "../../utils/Time";
+import { LoadingSpinner } from "../../components/Loading";
 
 //https://www.ditdot.hr/en/dark-mode-website-tutorial colour overrides
 
@@ -71,7 +72,7 @@ function Homeworks() {
           {homeworks ? (
             homeworks.map((data) => <HomeworkButton data={data} />)
           ) : (
-            <>loading homeworks</>
+            <LoadingSpinner />
           )}
         </div>
         <div>

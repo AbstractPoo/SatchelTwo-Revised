@@ -6,6 +6,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { createContext, useState, useEffect } from "react";
+import LoadingScreen from "../components/Loading";
 
 export const AuthContext = createContext();
 
@@ -41,7 +42,7 @@ export default function AuthContextProvider({ children }) {
           {children}
         </AuthContext.Provider>
       ) : (
-        <>loading</>
+        <LoadingScreen />
       )}
     </>
   );

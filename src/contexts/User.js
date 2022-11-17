@@ -1,6 +1,7 @@
 import { useGetApi, USER_DATA } from "../hooks/Api";
 import { useAuth } from "../hooks/Auth";
 import { createContext } from "react";
+import LoadingScreen from "../components/Loading";
 
 export const UserContext = createContext();
 
@@ -15,7 +16,7 @@ export default function UserContextProvider({ children }) {
           {children}
         </UserContext.Provider>
       ) : (
-        <>loading</>
+        <LoadingScreen />
       )}
     </>
   );
