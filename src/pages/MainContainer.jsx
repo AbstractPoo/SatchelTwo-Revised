@@ -3,6 +3,7 @@ import NavigationBar from "../components/NavigationBar";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Button } from "../components/Library";
 import Homeworks from "./LoggedIn/Homeworks";
+import Subscriptions from "./LoggedIn/Subscriptions";
 import Teacher from "./Teacher/Teacher";
 import AuthLocked from "../components/AuthLocked";
 
@@ -13,17 +14,11 @@ function MainContainer() {
     <div className="flex h-screen w-screen">
       <NavigationBar />
       <div className="w-full">
-        {
-          //<Button onClick={logOut}>log out of the account skid</Button>
-        }
         <Routes>
           <Route path="/">
             <Route index element={<Navigate to="/homeworks" />} />
             <Route path="/homeworks/*" element={<Homeworks />} />
-            <Route
-              path="/subscriptions/*"
-              element={<>future subscriptions page</>}
-            />
+            <Route path="/subscriptions/*" element={<Subscriptions />} />
 
             <Route
               path="/teacher/*"

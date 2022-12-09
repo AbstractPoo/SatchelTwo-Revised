@@ -5,41 +5,49 @@ import { useState, useEffect } from "react";
 export const USER_DATA = "/user/get";
 export const USER_HOMEWORKS = "/homework/get";
 export const USER_CLASSES = "/class/getalluser";
+export const ALL_CLASSES = "/class/getall";
+export const CREATOR_CLASSES = "/class/getallcreator";
+export const CREATOR_HOMEWORKS = "/homework/getallcreator";
 
+export const CLASS_LEAVE = "/class/leave";
 export const CLASS_CREATE = "/class/create";
+export const CLASS_JOIN = "/class/join";
 export const HOMEWORK_CREATE = "/homework/create";
+export const HOMEWORK_REMOVE = "/homework/remove";
 
 const responseCache = {};
+const toBeRefreshed = {};
 
-export function useGetApi(route, forceRefresh) {
+export function useGetApi(route) {
   const { auth } = useAuth();
   const [response, setResponse] = useState();
 
   useEffect(() => {
     (async function () {
       if (auth && auth?.currentUser) {
-        if (responseCache[route] && !forceRefresh) {
+        if (responseCache[route] && !toBeRefreshed[route]?.state) {
           setResponse(responseCache[route]);
         } else {
-          if (auth?.currentUser) {
-            const res = await RequestClient.get(auth, { url: route });
-            responseCache[route] = res.data;
-            setResponse(res.data);
-          }
+          const res = await RequestClient.get(auth, { url: route });
+          responseCache[route] = res.data;
+          toBeRefreshed[route] = { state: false };
+          setResponse(res.data);
         }
       }
     })();
-  }, [auth?.currentUser]);
+  }, [auth?.currentUser, toBeRefreshed[route]]);
 
   return response;
 }
 
-export function usePostApi(route) {
+export function usePostApi(route, forceRefreshes) {
   const { auth } = useAuth();
-
   async function tempApiFunc(data) {
     const res = await RequestClient.post(auth, { url: route, data: data });
-    return res;
+    forceRefreshes.forEach((refresh) => {
+      toBeRefreshed[refresh] = { state: true };
+    });
+    return res.data;
   }
 
   return tempApiFunc;

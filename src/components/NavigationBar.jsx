@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/Auth";
 import { USER_DATA, useGetApi } from "../hooks/Api";
+import { useFeedback } from "../hooks/Feedback";
 import {
   HomeworksNavigationIcon,
   SubscriptionsNavigationIcon,
@@ -31,17 +32,9 @@ const navigationRoutes = [
 // 3B3A47 use this colour becuase brian thinks it looks nice :)
 
 function NavigationBar() {
-  const [settings, setSettings] = useState(false);
   const { user } = useAuth();
   const userData = useGetApi(USER_DATA);
-
-  function displaySettings() {
-    setSettings(true);
-  }
-
-  function hideSettings() {
-    setSettings(false);
-  }
+  const { createModal } = useFeedback();
 
   return (
     <div className="flex flex-col w-60 bg-neutral-900 p-2.5 justify-between">
@@ -65,10 +58,9 @@ function NavigationBar() {
           })}
         </div>
       </div>
-      {settings ? <UserSettings hideSettings={hideSettings} /> : <></>}
       <div>
         <button
-          onClick={displaySettings}
+          onClick={() => createModal(<UserSettings />)}
           className="p-2 text-slate-200 text-xl rounded transition flex justify-start items-center gap-2.5 bg-neutral-800 w-full"
         >
           <img className="h-8 w-8 rounded" src={user.photoURL} alt="pfp" />

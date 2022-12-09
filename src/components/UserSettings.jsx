@@ -1,6 +1,34 @@
 import { useState } from "react";
+import { Listbox } from "@headlessui/react";
+ 
+const people = [
+  { id: 1, name: "Durward Reynolds", unavailable: false },
+  { id: 2, name: "Kenton Towne", unavailable: false },
+  { id: 3, name: "Therese Wunsch", unavailable: false },
+  { id: 4, name: "Benedict Kessler", unavailable: true },
+  { id: 5, name: "Katelyn Rohan", unavailable: false },
+];
 
-//https://flowbite.com/docs/components/modal/
+function MyListbox() {
+  const [selectedPerson, setSelectedPerson] = useState(people[0]);
+
+  return (
+    <Listbox value={selectedPerson} onChange={setSelectedPerson}>
+      <Listbox.Button>{selectedPerson.name}</Listbox.Button>
+      <Listbox.Options>
+        {people.map((person) => (
+          <Listbox.Option
+            key={person.id}
+            value={person}
+            disabled={person.unavailable}
+          >
+            {person.name}
+          </Listbox.Option>
+        ))}
+      </Listbox.Options>
+    </Listbox>
+  );
+}
 
 const pages = {
   appearance: <Appearance />,
@@ -9,7 +37,14 @@ const pages = {
 const pagesTabs = [{ name: "appearance" }];
 
 function Appearance() {
-  return <div>these are going to be the settings kiddo</div>;
+  return (
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full flex flex-row justify-between text-white">
+        <div>Theme</div>
+        <MyListbox />
+      </div>
+    </div>
+  );
 }
 
 function TabButton({ name }) {
@@ -23,22 +58,23 @@ function TabButton({ name }) {
   );
 }
 
-function UserSettings({ hideSettings }) {
+function UserSettings() {
   const [page, setPage] = useState("appearance");
   return (
     <>
-      <div className="absolute inset-0 z-40 w-screen h-screen bg-neutral-900 opacity-25"></div>
-      <div className="absolute inset-0 z-50 w-screen h-screen flex justify-center items-center">
-        <div>
-          <div className="w-60 bg-neutral-900 rounded opacity-100 flex p-2.5">
-            <button onClick={hideSettings}>X</button>
-            <div clasName="w-20 h-full">
-              {pagesTabs.map((pageTab) => (
-                <TabButton {...pageTab} />
-              ))}
-            </div>
-            <div>{pages[page]}</div>
+      <div>
+        <div className="w-96 bg-neutral-900 rounded opacity-100 flex p-2.5 gap-2">
+          <div className="h-full">
+            {pagesTabs.map((pageTab) => (
+              <TabButton
+                {...pageTab}
+                onClick={() => {
+                  setPage(page.name);
+                }}
+              />
+            ))}
           </div>
+          <div className="w-full">{pages[page]}</div>
         </div>
       </div>
     </>
