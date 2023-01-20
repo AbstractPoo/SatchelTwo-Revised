@@ -1,4 +1,4 @@
-# James Moyles Coursework SatchelTwo
+# Coursework SatchelTwo
 Source code at /src
 ## Run
 `npm start`
