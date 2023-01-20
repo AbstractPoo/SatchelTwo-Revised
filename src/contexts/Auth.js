@@ -1,21 +1,23 @@
 import { auth } from "../firebase";
 import {
-  getIdToken,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
 import { createContext, useState, useEffect } from "react";
+import LoadingScreen from "../components/Loading";
 
 export const AuthContext = createContext();
 
 export default function AuthContextProvider({ children }) {
   const [user, setUser] = useState();
+  const [loaded, setLoaded] = useState(false);
 
   function googleSignIn() {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider);
+    signInWithRedirect(auth, provider);
   }
 
   function logOut() {
@@ -24,6 +26,7 @@ export default function AuthContextProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setLoaded(true);
       setUser(currentUser);
     });
     return () => {
@@ -32,8 +35,16 @@ export default function AuthContextProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ auth, googleSignIn, logOut, user }}>
-      {children}
-    </AuthContext.Provider>
+    <>
+      {loaded ? (
+        <AuthContext.Provider
+          value={{ auth, googleSignIn, logOut, user, loaded }}
+        >
+          {children}
+        </AuthContext.Provider>
+      ) : (
+        <LoadingScreen />
+      )}
+    </>
   );
 }

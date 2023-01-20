@@ -1,4 +1,15 @@
 import { useState } from "react";
+import { Listbox, Switch } from "@headlessui/react";
+import { usePopper } from "react-popper";
+import { useAppearance } from "../hooks/Appearance";
+
+const people = [
+  { id: 1, name: "Durward Reynolds", unavailable: false },
+  { id: 2, name: "Kenton Towne", unavailable: false },
+  { id: 3, name: "Therese Wunsch", unavailable: false },
+  { id: 4, name: "Benedict Kessler", unavailable: true },
+  { id: 5, name: "Katelyn Rohan", unavailable: false },
+];
 
 const pages = {
   appearance: <Appearance />,
@@ -7,15 +18,40 @@ const pages = {
 const pagesTabs = [{ name: "appearance" }];
 
 function Appearance() {
-  return <div>these are going to be the settings kiddo</div>;
+  const { useDark } = useAppearance();
+  const [darkMode, setDarkMode] = useState(useDark.matches);
+  localStorage.setItem("darkMode", darkMode ? "true" : "");
+  if (darkMode) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+  return (
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full flex flex-row justify-between text-white">
+        <div>Dark Mode</div>
+        <Switch
+          checked={darkMode}
+          onChange={setDarkMode}
+          className={`${
+            darkMode ? "bg-blue-600" : "bg-neutral-800"
+          } relative inline-flex h-6 w-11 items-center rounded-full`}
+        >
+          <span className="sr-only">Enable notifications</span>
+          <span
+            className={`${
+              darkMode ? "translate-x-6" : "translate-x-1"
+            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+          />
+        </Switch>
+      </div>
+    </div>
+  );
 }
 
 function TabButton({ name }) {
   return (
-    <button
-      key={name}
-      className="p-2 text-slate-200 text-xl rounded transition flex justify-start items-center gap-2.5 bg-neutral-800 w-full"
-    >
+    <button className="p-2 text-slate-200 text-xl rounded transition flex justify-start items-center gap-2.5 bg-neutral-800 w-full">
       {name}
     </button>
   );
@@ -25,17 +61,20 @@ function UserSettings() {
   const [page, setPage] = useState("appearance");
   return (
     <>
-      <div className="absolute inset-0 z-40 w-screen h-screen bg-neutral-900 opacity-25"></div>
-      <div className="absolute inset-0 z-50 w-screen h-screen flex justify-center items-center">
-        <div>
-          <div className="w-60 bg-neutral-900 rounded opacity-100 flex p-2.5">
-            <div clasName="w-20 h-full">
-              {pagesTabs.map((pageTab) => (
-                <TabButton {...pageTab} />
-              ))}
-            </div>
-            <div>{pages[page]}</div>
+      <div>
+        <div className="w-96 bg-neutral-900 rounded opacity-100 flex p-2.5 gap-2">
+          <div className="h-full">
+            {pagesTabs.map((pageTab) => (
+              <TabButton
+                {...pageTab}
+                onClick={() => {
+                  setPage(page.name);
+                }}
+                key={page.name}
+              />
+            ))}
           </div>
+          <div className="w-full">{pages[page]}</div>
         </div>
       </div>
     </>

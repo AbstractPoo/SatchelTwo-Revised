@@ -1,7 +1,9 @@
 import { SatchelTwoIcon } from "./Library";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/Auth";
+import { USER_DATA, useGetApi } from "../hooks/Api";
+import { useFeedback } from "../hooks/Feedback";
 import {
   HomeworksNavigationIcon,
   SubscriptionsNavigationIcon,
@@ -19,17 +21,20 @@ const navigationRoutes = [
     name: "Subscriptions",
     icon: <SubscriptionsNavigationIcon />,
   },
+  {
+    href: "/teacher",
+    name: "Teacher",
+    icon: <SubscriptionsNavigationIcon />,
+    routeLevel: 1,
+  },
 ];
 
 // 3B3A47 use this colour becuase brian thinks it looks nice :)
 
 function NavigationBar() {
-  const [settings, setSettings] = useState(false);
   const { user } = useAuth();
-
-  function displaySettings() {
-    setSettings(true);
-  }
+  const userData = useGetApi(USER_DATA);
+  const { createModal } = useFeedback();
 
   return (
     <div className="flex flex-col w-60 bg-neutral-900 p-2.5 justify-between">
@@ -41,15 +46,21 @@ function NavigationBar() {
           </div>
         </div>
         <div className="flex flex-col gap-2.5 w-full">
-          {navigationRoutes.map((route) => (
-            <NavigationButton {...route} />
-          ))}
+          {navigationRoutes.flatMap((route) => {
+            if (
+              !route.routeLevel ||
+              (userData?.level && userData?.level >= route.routeLevel)
+            ) {
+              return [<NavigationButton key={route.name} {...route} />];
+            } else {
+              return [];
+            }
+          })}
         </div>
       </div>
-      {settings ? <UserSettings /> : <></>}
       <div>
         <button
-          onClick={displaySettings}
+          onClick={() => createModal(<UserSettings />)}
           className="p-2 text-slate-200 text-xl rounded transition flex justify-start items-center gap-2.5 bg-neutral-800 w-full"
         >
           <img className="h-8 w-8 rounded" src={user.photoURL} alt="pfp" />
