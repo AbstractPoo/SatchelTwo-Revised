@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Listbox } from "@headlessui/react";
- 
+import { Listbox, Switch } from "@headlessui/react";
+import { usePopper } from "react-popper";
+import { useAppearance } from "../hooks/Appearance";
+
 const people = [
   { id: 1, name: "Durward Reynolds", unavailable: false },
   { id: 2, name: "Kenton Towne", unavailable: false },
@@ -9,27 +11,6 @@ const people = [
   { id: 5, name: "Katelyn Rohan", unavailable: false },
 ];
 
-function MyListbox() {
-  const [selectedPerson, setSelectedPerson] = useState(people[0]);
-
-  return (
-    <Listbox value={selectedPerson} onChange={setSelectedPerson}>
-      <Listbox.Button>{selectedPerson.name}</Listbox.Button>
-      <Listbox.Options>
-        {people.map((person) => (
-          <Listbox.Option
-            key={person.id}
-            value={person}
-            disabled={person.unavailable}
-          >
-            {person.name}
-          </Listbox.Option>
-        ))}
-      </Listbox.Options>
-    </Listbox>
-  );
-}
-
 const pages = {
   appearance: <Appearance />,
 };
@@ -37,11 +18,32 @@ const pages = {
 const pagesTabs = [{ name: "appearance" }];
 
 function Appearance() {
+  const { useDark } = useAppearance();
+  const [darkMode, setDarkMode] = useState(useDark.matches);
+  localStorage.setItem("darkMode", darkMode ? "true" : "");
+  if (darkMode) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full flex flex-row justify-between text-white">
-        <div>Theme</div>
-        <MyListbox />
+        <div>Dark Mode</div>
+        <Switch
+          checked={darkMode}
+          onChange={setDarkMode}
+          className={`${
+            darkMode ? "bg-blue-600" : "bg-neutral-800"
+          } relative inline-flex h-6 w-11 items-center rounded-full`}
+        >
+          <span className="sr-only">Enable notifications</span>
+          <span
+            className={`${
+              darkMode ? "translate-x-6" : "translate-x-1"
+            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+          />
+        </Switch>
       </div>
     </div>
   );
@@ -49,10 +51,7 @@ function Appearance() {
 
 function TabButton({ name }) {
   return (
-    <button
-      key={name}
-      className="p-2 text-slate-200 text-xl rounded transition flex justify-start items-center gap-2.5 bg-neutral-800 w-full"
-    >
+    <button className="p-2 text-slate-200 text-xl rounded transition flex justify-start items-center gap-2.5 bg-neutral-800 w-full">
       {name}
     </button>
   );
@@ -71,6 +70,7 @@ function UserSettings() {
                 onClick={() => {
                   setPage(page.name);
                 }}
+                key={page.name}
               />
             ))}
           </div>

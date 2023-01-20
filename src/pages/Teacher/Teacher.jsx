@@ -11,6 +11,7 @@ import {
 import { useRef, useState } from "react";
 
 import { useFeedback } from "../../hooks/Feedback";
+import { useAuth } from "../../hooks/Auth";
 
 function Teacher() {
   return (
@@ -71,13 +72,14 @@ function Classes() {
             <ClassButton
               classData={classData}
               setSelectedClassId={setSelectedClassId}
+              key={setSelectedClassId}
             />
           ))
         ) : (
           <>loading classes</>
         )}
       </div>
-      <Homeworks selectedClassId={selectedClassId} />
+      {selectedClassId ? <Homeworks selectedClassId={selectedClassId} /> : null}
     </>
   );
 }
@@ -106,17 +108,29 @@ function CreateHomeworkModal({ classId }) {
     CREATOR_HOMEWORKS,
     USER_HOMEWORKS,
   ]);
+  const { user } = useAuth();
+  const { closeModal } = useFeedback();
 
   const title = useRef();
   const description = useRef();
   const due = useRef();
 
+  const resourceLink = useRef();
+  const resourceName = useRef();
+
+  const [resources, setResources] = useState([]);
+  const [resourceModalState, setResourceModalState] = useState(false);
+
   function handleCreateHomework() {
+    closeModal();
     createHomework({
       title: title.current.value,
       description: description.current.value,
       due: due.current.value,
       classId: classId,
+      resources: resources,
+      teacherName: user.displayName,
+      teacherPhoto: user.photoURL,
     });
   }
 
@@ -134,7 +148,57 @@ function CreateHomeworkModal({ classId }) {
         <div>Due: </div>
         <input type="date" ref={due} />
       </div>
+      <div className="flex flex-col justify-between">
+        <div className="flex flex-row">
+          <div>Resources: </div>
+          <button
+            onClick={() => {
+              setResourceModalState(true);
+            }}
+          >
+            Add Resource
+          </button>
+        </div>
+        {resources?.map((resource) => (
+          <div key={resource.name}>{resource.name}</div>
+        ))}
+      </div>
       <button onClick={handleCreateHomework}>create</button>
+      {resourceModalState ? (
+        <div className="flex flex-col">
+          <div className="flex flex-row justify-between gap-2.5">
+            <div>Resource Name</div>
+            <input ref={resourceName} />
+          </div>
+          <div className="flex flex-row justify-between gap-2.5">
+            <div>Resource Link</div>
+            <input ref={resourceLink} />
+          </div>
+          <div>
+            <button
+              onClick={() => {
+                setResourceModalState(false);
+              }}
+            >
+              cancel
+            </button>
+            <button
+              onClick={() => {
+                resources.push({
+                  name: resourceName.current.value,
+                  link: resourceLink.current.value,
+                });
+                setResources(resources);
+                setResourceModalState(false);
+              }}
+            >
+              create
+            </button>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
@@ -158,7 +222,7 @@ function Homeworks({ selectedClassId }) {
       <div className="flex flex-col gap-2.5">
         {filteredHomeworks ? (
           filteredHomeworks.map((homework) => (
-            <HomeworkButton data={homework} />
+            <HomeworkButton data={homework} key={homework._id} />
           ))
         ) : (
           <></>

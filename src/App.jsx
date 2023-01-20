@@ -2,16 +2,19 @@ import Router from "./Router";
 import AuthContextProvider from "./contexts/Auth";
 import UserContextProvider from "./contexts/User";
 import FeedbackContextProvider from "./contexts/Feedback";
-// USE FRAMER MOTION FOR ANIMATIONS
+import AppearanceContextProvider from "./contexts/Appearance";
+
 function App() {
   return (
-    <AuthContextProvider>
-      <UserContextProvider>
-        <FeedbackContextProvider>
-          <Router />
-        </FeedbackContextProvider>
-      </UserContextProvider>
-    </AuthContextProvider>
+    <AppearanceContextProvider>
+      <AuthContextProvider>
+        <UserContextProvider>
+          <FeedbackContextProvider>
+            <Router />
+          </FeedbackContextProvider>
+        </UserContextProvider>
+      </AuthContextProvider>
+    </AppearanceContextProvider>
   );
 }
 

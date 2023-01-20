@@ -1,8 +1,15 @@
-import { useGetApi, USER_HOMEWORKS } from "../../hooks/Api";
+import {
+  HOMEWORK_COMPLETE,
+  HOMEWORK_UNCOMPLETE,
+  useGetApi,
+  usePostApi,
+  USER_HOMEWORKS,
+} from "../../hooks/Api";
 import { Routes, Route, useParams, Link } from "react-router-dom";
 import { getDay, getDate, getMonth } from "../../utils/Time";
 import { LoadingSpinner } from "../../components/Loading";
 import { DateIcon, ArrowIcon, AttachmentIcon } from "../../components/Library";
+import { useAuth } from "../../hooks/Auth";
 
 //https://www.ditdot.hr/en/dark-mode-website-tutorial colour overrides
 
@@ -22,6 +29,8 @@ function HomeworkButton({ data }) {
   const due = new Date(data.due);
   const params = useParams();
   const homeworkId = params["*"];
+  const user = useAuth();
+  const { uid } = user;
 
   const dueDay = getDay(due);
   const dueDate = getDate(due);
@@ -29,35 +38,57 @@ function HomeworkButton({ data }) {
   const importance = getImportance(due);
   const importanceColor = homeworkImportanceColors[importance];
   const importanceDefinition = homeworkImportanceDefinitions[importance];
+
+  const completeHomework = usePostApi(HOMEWORK_COMPLETE);
+  const uncompleteHomework = usePostApi(HOMEWORK_UNCOMPLETE);
+
+  function handleComplete() {
+    completeHomework({ homeworkId: homeworkId });
+  }
+  function handleUncomplete() {
+    uncompleteHomework({ homeworkId: homeworkId });
+  }
+
+  let completed = false;
+  data.usersCompleted.forEach((user) => {
+    if (user === uid) {
+      completed = true;
+    }
+  });
+
   return (
     <Link
       key={data._id}
       className={
-        "h-24 bg-neutral-100 dark:bg-neutral-700 rounded flex shadow-md" +
-        (homeworkId ? " w-[calc(24rem-20px)]" : " w-full max-w-4 xl")
+        "h-24 bg-neutral-100 dark:bg-neutral-700 rounded flex shadow-md w-full"
       }
       to={data._id === homeworkId ? "/" : data._id}
     >
       <div
-        className="w-24 h-full flex flex-col justify-around p-3 items-center rounded-tl rounded-bl"
+        className="h-full flex flex-col justify-around w-0 p-3 px-12 items-center rounded-tl rounded-bl"
         style={{ backgroundColor: importanceColor }}
       >
         <div className="text-sm text-white/75">{dueDay}</div>
         <div className="text-2xl text-white">{dueDate}</div>
         <div className="text-sm text-white/75">{dueMonth}</div>
       </div>
-      <div className="p-3 flex flex-col justify-around">
+      <div className="p-3 flex flex-col justify-around block w-full">
         <div className="font-bold text-xs" style={{ color: importanceColor }}>
           {importanceDefinition}
         </div>
-        <div className="font-semibold w-[180px] text-md truncate dark:text-white">
+        <div className="font-semibold text-md truncate dark:text-white w-[calc(100%-96px)]">
           {data.title}
         </div>
-        <div className="text-xs w-[180px] truncate dark:text-white/75">
+        <div className="text-xs truncate dark:text-white/75 w-[calc(100%-96px)]">
           {data.description}
         </div>
-        <div className="text-xs text-neutral-500">{data.class}</div>
+        <div className="text-xs text-neutral-500 w-[calc(100%-96px)]">
+          {data.class}
+        </div>
       </div>
+      <button onClick={handleComplete}>complete</button>
+      <button onClick={handleUncomplete}>uncomplete</button>
+      <div>{completed ? "yes" : "no"}</div>
     </Link>
   );
 }
@@ -73,11 +104,11 @@ function Homeworks() {
           <>
             <div
               className={
-                "bg-gray-200 dark:bg-neutral-800" +
+                "bg-gray-200 dark:bg-neutral-800 flex flex-col items-center" +
                 (!homeworkId ? " w-full" : " w-96")
               }
             >
-              <div className="h-full flex flex-col items-center p-2.5 gap-2.5">
+              <div className="h-full flex flex-col items-center p-2.5 gap-2.5 w-full max-w-screen-md">
                 {homeworks.map((data) => (
                   <HomeworkButton key={data._id} data={data} />
                 ))}
@@ -108,7 +139,8 @@ function Homeworks() {
 }
 
 function HomeworkPageLayout({ homework }) {
-  const { title, description, due, set, resources } = homework;
+  const { title, description, due, set, resources, teacherName, teacherPhoto } =
+    homework;
   const importance = getImportance(new Date(due));
   const importanceColor = homeworkImportanceColors[importance];
   return (
@@ -119,8 +151,13 @@ function HomeworkPageLayout({ homework }) {
             <div className="text-4xl text-neutal-900 dark:text-neutral-100">
               {title}
             </div>
-            <div className="dark:text-white">
-              {"teacher's name in the future"}
+            <div className="flex flex-row gap-2.5 items-center">
+              <div className="text-xl text-neutral-700">{teacherName}</div>
+              <img
+                src={teacherPhoto}
+                alt={teacherName}
+                className="w-8 h-8 rounded-full"
+              />
             </div>
           </div>
           <div className="flex flex-row gap-2.5">
@@ -149,6 +186,7 @@ function HomeworkPageLayout({ homework }) {
                   className="flex flex-row bg-gray-200 dark:bg-neutral-800 p-2.5 gap-2.5 rounded items-center"
                   target="_blank"
                   rel="noreferrer"
+                  key={resource.name}
                 >
                   <AttachmentIcon className="text-neutral-800 dark:text-neutral-200" />
                   <div className="text-neutral-800 dark:text-neutral-200 text-sm">

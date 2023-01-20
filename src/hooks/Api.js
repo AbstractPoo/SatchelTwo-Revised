@@ -14,6 +14,8 @@ export const CLASS_CREATE = "/class/create";
 export const CLASS_JOIN = "/class/join";
 export const HOMEWORK_CREATE = "/homework/create";
 export const HOMEWORK_REMOVE = "/homework/remove";
+export const HOMEWORK_COMPLETE = "/homework/complete";
+export const HOMEWORK_UNCOMPLETE = "/homework/uncomplete";
 
 const responseCache = {};
 const toBeRefreshed = {};

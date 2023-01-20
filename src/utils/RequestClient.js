@@ -2,7 +2,7 @@ import axios from "axios";
 import { getIdToken } from "firebase/auth";
 
 const axiosClient = axios.create({
-  baseURL: "https://satcheltwo-api.abstractpoo.repl.co",
+  baseURL: "https://ppny8d-3000.preview.csb.app/", //"https://satcheltwo-api.abstractpoo.repl.co",
   json: true,
 });
 

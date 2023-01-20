@@ -1,4 +1,4 @@
-const messages = ["Fetching homeworks from hell..."];
+const messages = ["Loading homeworks..."];
 
 function LoadingScreen({ message }) {
   message =
