@@ -43,7 +43,7 @@ function SubscriptionItem({ data }) {
     })();
   }
   return (
-    <div className="h-24 bg-neutral-100 dark:bg-neutral-700 rounded flex shadow-md">
+    <div className="h-12 bg-neutral-100 dark:bg-neutral-700 rounded flex shadow-md text-black dark:text-white items-center p-2.5 gap-2.5">
       <div>{data.name}</div>
       <button onClick={joined ? handleLeaveClass : handleJoinClass}>
         {loading ? <LoadingSpinner size={6} /> : joined ? "leave" : "join"}
@@ -56,7 +56,7 @@ function Subscriptions() {
   const allClasses = useGetApi(ALL_CLASSES);
   return (
     <>
-      <div className="w-full h-full bg-gray-200 flex flex-col items-center dark:bg-neutral-800">
+      <div className="w-full h-full bg-gray-200 flex flex-col items-center dark:bg-neutral-800 p-2.5 gap-2.5">
         {allClasses?.map((cl) => (
           <SubscriptionItem key={cl._id} data={cl} />
         ))}

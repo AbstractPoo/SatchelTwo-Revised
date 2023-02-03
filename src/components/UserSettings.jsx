@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { Listbox, Switch } from "@headlessui/react";
-import { usePopper } from "react-popper";
-import { useAppearance } from "../hooks/Appearance";
 
 const people = [
   { id: 1, name: "Durward Reynolds", unavailable: false },
@@ -12,20 +10,14 @@ const people = [
 ];
 
 const pages = {
-  appearance: <Appearance />,
+  /*appearance: <Appearance />,*/
 };
 
-const pagesTabs = [{ name: "appearance" }];
+const pagesTabs = [
+  /*{ name: "appearance" }*/
+];
 
-function Appearance() {
-  const { useDark } = useAppearance();
-  const [darkMode, setDarkMode] = useState(useDark.matches);
-  localStorage.setItem("darkMode", darkMode ? "true" : "");
-  if (darkMode) {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-  }
+/*function Appearance() {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full flex flex-row justify-between text-white">
@@ -47,7 +39,7 @@ function Appearance() {
       </div>
     </div>
   );
-}
+}*/
 
 function TabButton({ name }) {
   return (
