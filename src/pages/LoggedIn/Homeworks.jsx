@@ -5,12 +5,14 @@ import {
   usePostApi,
   USER_HOMEWORKS,
 } from "../../hooks/Api";
+import { useState } from "react";
 import { Routes, Route, useParams, Link } from "react-router-dom";
 import { getDay, getDate, getMonth } from "../../utils/Time";
 import { LoadingSpinner } from "../../components/Loading";
 import { DateIcon, ArrowIcon, AttachmentIcon } from "../../components/Library";
 import { useAuth } from "../../hooks/Auth";
-
+import { useLocalStorage } from "usehooks-ts";
+import { CrossIcon, TickIcon } from "../../components/Library";
 //https://www.ditdot.hr/en/dark-mode-website-tutorial colour overrides
 
 const homeworkImportanceColors = ["#D95F5F", "#ECA25E", "#75D066"];
@@ -29,8 +31,9 @@ function HomeworkButton({ data }) {
   const due = new Date(data.due);
   const params = useParams();
   const homeworkId = params["*"];
-  const user = useAuth();
+  const { user } = useAuth();
   const { uid } = user;
+  const completed = data?.usersCompleted?.find((user) => user.uid === uid);
 
   const dueDay = getDay(due);
   const dueDate = getDate(due);
@@ -41,62 +44,129 @@ function HomeworkButton({ data }) {
 
   const completeHomework = usePostApi(HOMEWORK_COMPLETE);
   const uncompleteHomework = usePostApi(HOMEWORK_UNCOMPLETE);
+  const [loading, setLoading] = useState(false);
+  const [update, setUpdate] = useState();
 
   function handleComplete() {
-    completeHomework({ homeworkId: homeworkId });
-  }
-  function handleUncomplete() {
-    uncompleteHomework({ homeworkId: homeworkId });
+    (async function () {
+      setLoading(true);
+      const res = await completeHomework({ homeworkId: data._id });
+      if (res.modifiedCount) {
+        data.usersCompleted = [{ uid: uid }];
+        setUpdate({});
+      }
+      setLoading(false);
+    })();
   }
 
-  let completed = false;
-  data.usersCompleted.forEach((user) => {
-    if (user === uid) {
-      completed = true;
+  function handleUncomplete() {
+    (async function () {
+      setLoading(true);
+      const res = await uncompleteHomework({ homeworkId: data._id });
+      if (res.modifiedCount) {
+        data.usersCompleted = [];
+        setUpdate({});
+      }
+      setLoading(false);
+    })();
+  }
+
+  function handleToggleComplete() {
+    if (completed) {
+      handleUncomplete();
+    } else {
+      handleComplete();
     }
-  });
+  }
 
   return (
-    <Link
-      key={data._id}
+    <div
       className={
-        "h-24 bg-neutral-100 dark:bg-neutral-700 rounded flex shadow-md w-full"
+        "h-24 bg-neutral-100 dark:bg-neutral-700 rounded flex shadow-md w-full justify-between min-w-0"
       }
-      to={data._id === homeworkId ? "/" : data._id}
     >
-      <div
-        className="h-full flex flex-col justify-around w-0 p-3 px-12 items-center rounded-tl rounded-bl"
-        style={{ backgroundColor: importanceColor }}
-      >
-        <div className="text-sm text-white/75">{dueDay}</div>
-        <div className="text-2xl text-white">{dueDate}</div>
-        <div className="text-sm text-white/75">{dueMonth}</div>
+      <div className="flex flex-row min-w-0">
+        <div
+          className="h-full flex flex-col justify-around p-3 w-24 h-24 items-center rounded-tl rounded-bl flex-shrink-0"
+          style={{ backgroundColor: importanceColor }}
+        >
+          <div className="text-sm text-white/75">{dueDay}</div>
+          <div className="text-2xl text-white">{dueDate}</div>
+          <div className="text-sm text-white/75">{dueMonth}</div>
+        </div>
+        <Link
+          to={data._id === homeworkId ? "/" : data._id}
+          className="p-3 flex flex-col justify-around block grow flex-shrink min-w-0"
+        >
+          <div
+            className="font-bold text-xs min-w-0 w-full"
+            style={{ color: importanceColor }}
+          >
+            {importanceDefinition}
+          </div>
+          <div className="font-semibold text-md truncate dark:text-white min-w-0 w-full">
+            {data.title}
+          </div>
+          <div className="text-xs truncate dark:text-white/75 min-w-0 w-full">
+            {data.description}
+          </div>
+          <div className="text-xs truncate text-neutral-500 min-w-0 w-full">
+            {data.class}
+          </div>
+        </Link>
       </div>
-      <div className="p-3 flex flex-col justify-around block w-full">
-        <div className="font-bold text-xs" style={{ color: importanceColor }}>
-          {importanceDefinition}
-        </div>
-        <div className="font-semibold text-md truncate dark:text-white w-[calc(100%-96px)]">
-          {data.title}
-        </div>
-        <div className="text-xs truncate dark:text-white/75 w-[calc(100%-96px)]">
-          {data.description}
-        </div>
-        <div className="text-xs text-neutral-500 w-[calc(100%-96px)]">
-          {data.class}
-        </div>
+      <div className="w-fit flex-shrink-0">
+        <button
+          className="rounded bg-gray-200 p-1 m-2.5 hover:bg-gray-300 transition flex"
+          onClick={handleToggleComplete}
+        >
+          {loading ? (
+            <LoadingSpinner size={3} />
+          ) : (
+            <>
+              {completed ? (
+                <TickIcon className="w-3 h-3" />
+              ) : (
+                <CrossIcon className="w-3 h-3" />
+              )}
+            </>
+          )}
+        </button>
       </div>
-      <button onClick={handleComplete}>complete</button>
-      <button onClick={handleUncomplete}>uncomplete</button>
-      <div>{completed ? "yes" : "no"}</div>
-    </Link>
+    </div>
   );
 }
 
 function Homeworks() {
-  const homeworks = useGetApi(USER_HOMEWORKS);
+  let homeworks = useGetApi(USER_HOMEWORKS);
   const params = useParams();
   const homeworkId = params["*"];
+  const [showCompleted, setShowCompleted] = useLocalStorage(
+    "showCompleted",
+    true
+  );
+  const { user } = useAuth();
+  const { uid } = user;
+
+  function filterHomeworks(homework) {
+    let completed = false;
+    homework?.usersCompleted.forEach((user) => {
+      if (user.uid === uid) {
+        completed = true;
+      }
+    });
+    return !completed;
+  }
+
+  let filteredHomeworks = homeworks;
+  if (!showCompleted && homeworks) {
+    filteredHomeworks = homeworks.filter(filterHomeworks);
+  }
+
+  function handleShowCompleteHomework() {
+    setShowCompleted((prev) => !prev);
+  }
+
   return (
     <>
       <div className="flex flex-row h-screen w-full">
@@ -108,8 +178,21 @@ function Homeworks() {
                 (!homeworkId ? " w-full" : " w-96")
               }
             >
+              <button
+                className="bg-neutral-100 mt-2.5 dark:bg-neutral-700 rounded flex shadow-md text-black/75 dark:text-white/75 p-2.5"
+                onClick={handleShowCompleteHomework}
+              >
+                <span
+                  className={
+                    showCompleted ? "text-[#D95F5F]" : "text-[#75D066]"
+                  }
+                >
+                  {showCompleted ? "hide" : "show"}
+                </span>
+                &nbsp;completed homeworks
+              </button>
               <div className="h-full flex flex-col items-center p-2.5 gap-2.5 w-full max-w-screen-md">
-                {homeworks.map((data) => (
+                {filteredHomeworks.map((data) => (
                   <HomeworkButton key={data._id} data={data} />
                 ))}
               </div>
@@ -152,7 +235,9 @@ function HomeworkPageLayout({ homework }) {
               {title}
             </div>
             <div className="flex flex-row gap-2.5 items-center">
-              <div className="text-xl text-neutral-700">{teacherName}</div>
+              <div className="text-xl text-neutral-700 dark:text-neutral-200">
+                {teacherName}
+              </div>
               <img
                 src={teacherPhoto}
                 alt={teacherName}
@@ -205,8 +290,9 @@ function HomeworkPageLayout({ homework }) {
 function HomeworkPage({ homeworks }) {
   const { homeworkId } = useParams();
   const homework = homeworks?.find((item) => item._id === homeworkId);
+  // min width magically vanishing
   return (
-    <div className="w-full">
+    <div className="min-w-0 w-full">
       {homework ? (
         <HomeworkPageLayout homework={homework} />
       ) : (

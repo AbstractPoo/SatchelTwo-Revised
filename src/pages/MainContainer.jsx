@@ -6,6 +6,7 @@ import Homeworks from "./LoggedIn/Homeworks";
 import Subscriptions from "./LoggedIn/Subscriptions";
 import Teacher from "./Teacher/Teacher";
 import AuthLocked from "../components/AuthLocked";
+import Admin from "./Teacher/Admin";
 
 function MainContainer() {
   const { logOut } = useAuth();
@@ -13,7 +14,7 @@ function MainContainer() {
   return (
     <div className="flex h-screen w-screen">
       <NavigationBar />
-      <div className="w-full">
+      <div className="w-full min-w-0">
         <Routes>
           <Route path="/">
             <Route index element={<Navigate to="/homeworks" />} />
@@ -28,6 +29,14 @@ function MainContainer() {
                 </AuthLocked>
               }
             />
+            <Route
+              path="/admin"
+              element={
+                <AuthLocked level={2}>
+                  <Admin />
+                </AuthLocked>
+              }
+            ></Route>
           </Route>
         </Routes>
       </div>

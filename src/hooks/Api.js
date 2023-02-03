@@ -46,7 +46,7 @@ export function usePostApi(route, forceRefreshes) {
   const { auth } = useAuth();
   async function tempApiFunc(data) {
     const res = await RequestClient.post(auth, { url: route, data: data });
-    forceRefreshes.forEach((refresh) => {
+    forceRefreshes?.forEach((refresh) => {
       toBeRefreshed[refresh] = { state: true };
     });
     return res.data;
