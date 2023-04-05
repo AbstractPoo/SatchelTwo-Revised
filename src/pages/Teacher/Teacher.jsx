@@ -12,10 +12,11 @@ import { useRef, useState } from "react";
 
 import { useFeedback } from "../../hooks/Feedback";
 import { useAuth } from "../../hooks/Auth";
+import { AddIcon, Button } from "../../components/Library";
 
 function Teacher() {
   return (
-    <div className="flex flex-row gap-2">
+    <div className="flex flex-row bg-gray-200 dark:bg-neutral-800 h-full">
       <Classes />
     </div>
   );
@@ -25,6 +26,7 @@ function ClassButton({ classData, setSelectedClassId }) {
   const { name } = classData;
   return (
     <button
+      className="bg-neutral-100 dark:bg-neutral-700 rounded p-2.5 text-black dark:text-white"
       onClick={() => {
         setSelectedClassId(classData?._id);
       }}
@@ -44,7 +46,7 @@ function CreateClassModal() {
 
   return (
     <div className="p-2.5">
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between gap-4">
         <div>Name: </div>
         <input ref={className} />
       </div>
@@ -59,14 +61,16 @@ function Classes() {
   const [selectedClassId, setSelectedClassId] = useState();
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <button
+      <div className="flex flex-col gap-2.5 p-2.5">
+        <Button
+          className="whitespace-nowrap"
           onClick={() => {
             createModal(<CreateClassModal />);
           }}
         >
           create class
-        </button>
+          <AddIcon />
+        </Button>
         {createdClasses ? (
           createdClasses.map((classData) => (
             <ClassButton
@@ -90,9 +94,10 @@ function HomeworkButton({ data }) {
     USER_HOMEWORKS,
   ]);
   return (
-    <div className="flex flex-row bg-neutral-200 justify-between gap-2.5">
-      <div>{data.title}</div>
+    <div className="flex flex-row bg-neutral-200 dark:bg-neutral-800 justify-between gap-2.5 p-1 items-center rounded text-neutral-800 dark:text-neutral-200">
+      <div className="px-2.5">{data.title}</div>
       <button
+        className="px-2.5 py-1.5 hover:bg-red-800 rounded"
         onClick={() => {
           deleteHomework({ homeworkId: data._id });
         }}
@@ -135,7 +140,7 @@ function CreateHomeworkModal({ classId }) {
   }
 
   return (
-    <div className="p-2.5">
+    <div className="p-2.5 flex flex-col gap-2.5 [&>*]:gap-4 [&>*>input]:bg-neutral-200 [&>*>input]:rounded">
       <div className="flex flex-row justify-between">
         <div>Title: </div>
         <input ref={title} />
@@ -211,14 +216,15 @@ function Homeworks({ selectedClassId }) {
   );
 
   return (
-    <div className="flex flex-col">
-      <button
+    <div className="flex flex-col p-2.5 gap-2.5 w-full h-full bg-neutral-100 dark:bg-neutral-700">
+      <Button
         onClick={() => {
           createModal(<CreateHomeworkModal classId={selectedClassId} />);
         }}
       >
-        create Homework
-      </button>
+        create homework
+        <AddIcon />
+      </Button>
       <div className="flex flex-col gap-2.5">
         {filteredHomeworks ? (
           filteredHomeworks.map((homework) => (

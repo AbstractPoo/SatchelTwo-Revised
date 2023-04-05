@@ -31,9 +31,14 @@ export function useGetApi(route) {
           setResponse(responseCache[route]);
         } else {
           const res = await RequestClient.get(auth, { url: route });
-          responseCache[route] = res.data;
-          toBeRefreshed[route] = { state: false };
-          setResponse(res.data);
+          if (res.data.error) {
+            console.log(res.data.error)
+            setResponse(null);
+          } else {
+            responseCache[route] = res.data;
+            toBeRefreshed[route] = { state: false };
+            setResponse(res.data);
+          }
         }
       }
     })();
