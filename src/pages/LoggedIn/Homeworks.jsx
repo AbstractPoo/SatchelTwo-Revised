@@ -45,7 +45,7 @@ function HomeworkButton({ data }) {
   const completeHomework = usePostApi(HOMEWORK_COMPLETE);
   const uncompleteHomework = usePostApi(HOMEWORK_UNCOMPLETE);
   const [loading, setLoading] = useState(false);
-  const [update, setUpdate] = useState();
+  const [, setUpdate] = useState();
 
   function handleComplete() {
     (async function () {
@@ -160,7 +160,7 @@ function Homeworks() {
 
   let filteredHomeworks = homeworks;
   if (!showCompleted && homeworks) {
-    filteredHomeworks = homeworks.filter(filterHomeworks);
+    filteredHomeworks = homeworks?.filter(filterHomeworks);
   }
 
   function handleShowCompleteHomework() {
@@ -292,7 +292,7 @@ function HomeworkPage({ homeworks }) {
   const homework = homeworks?.find((item) => item._id === homeworkId);
   // min width magically vanishing
   return (
-    <div className="min-w-0 w-full">
+    <div className=" w-full">
       {homework ? (
         <HomeworkPageLayout homework={homework} />
       ) : (
